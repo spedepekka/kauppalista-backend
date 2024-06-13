@@ -1,28 +1,38 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class GroceriesService {
 
-    private groceries = [
-        {
-            "id": 1,
-            "name": "banana",
-            "bought": false
-        },
-        {
-            "id": 2,
-            "name": "apple",
-            "bought": false
-        },
-    ]
+    constructor(private readonly databaseService: DatabaseService) {}
 
-    findAll() {
-        return this.groceries
+    async create(createGroceryDto: Prisma.GroceryCreateInput) {
+        console.log(`New grocery ${createGroceryDto}`)
+        return this.databaseService.grocery.create({
+            data: createGroceryDto
+        })
     }
 
-    create(grocery: string) {
-        console.log(`New grocery ${grocery}`)
-        this.groceries.push({"id": 666, "name": grocery, "bought": false})
-        return this.groceries
+    async findAll() {
+        return this.databaseService.grocery.findMany()
+    }
+
+    // TODO: Disable id update
+    async update(id: number, updateGroceryDto: Prisma.GroceryUpdateInput) {
+        return this.databaseService.grocery.update({
+            where: {
+              id,
+            },
+            data: updateGroceryDto,
+        })
+    }
+
+    async remove(id: number) {
+        return this.databaseService.grocery.delete({
+            where: {
+              id,
+            }
+        })
     }
 }
